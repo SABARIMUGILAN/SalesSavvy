@@ -5,7 +5,7 @@ import './assets/styles.css';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/SalesSavvy">
       <AppRoutes />
     </Router>
   );
