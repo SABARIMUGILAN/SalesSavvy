@@ -15,13 +15,15 @@ import com.example.demo.dto.LoginRequest;
 import com.example.demo.entity.User;
 import com.example.demo.service.AuthService;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @CrossOrigin(
-    origins = "https://salessavvy-frontend-latest.onrender.com",
+    origins = {
+        "https://salessavvy-frontend-latest.onrender.com",
+        "https://sabarimugilan.github.io"
+    },
     allowCredentials = "true"
 )
 @RequestMapping("/api/auth")
@@ -60,15 +62,6 @@ public class AuthController {
             System.out.println("STEP 4: Token generated");
 
             // Create authentication cookie
-            Cookie cookie = new Cookie("authToken", token);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(3600);
-
-            response.addCookie(cookie);
-
-            // SameSite=None is required for cross-site requests
             response.setHeader(
                     "Set-Cookie",
                     String.format(
@@ -129,16 +122,7 @@ public class AuthController {
 
             authService.logout(user);
 
-            Cookie cookie =
-                    new Cookie("authToken", null);
-
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setMaxAge(0);
-            cookie.setPath("/");
-
-            response.addCookie(cookie);
-
+            // Delete authentication cookie
             response.setHeader(
                     "Set-Cookie",
                     "authToken=; HttpOnly; Secure; Path=/; Max-Age=0; SameSite=None"

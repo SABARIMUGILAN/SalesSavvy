@@ -11,7 +11,10 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(
-        origins = "https://salessavvy-frontend-latest.onrender.com",
+        origins = {
+                "https://salessavvy-frontend-latest.onrender.com",
+                "https://sabarimugilan.github.io"
+        },
         allowCredentials = "true"
 )
 @RequestMapping("/api/orders")

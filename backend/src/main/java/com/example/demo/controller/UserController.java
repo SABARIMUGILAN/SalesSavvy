@@ -15,7 +15,10 @@ import com.example.demo.service.UserService;
 
 @RestController
 @CrossOrigin(
-        origins = "https://salessavvy-frontend-latest.onrender.com",
+        origins = {
+                "https://salessavvy-frontend-latest.onrender.com",
+                "https://sabarimugilan.github.io"
+        },
         allowCredentials = "true"
 )
 @RequestMapping("/api/users")
@@ -30,20 +33,31 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
+
         try {
-            User registeredUser = userService.registerUser(user);
+            User registeredUser =
+                    userService.registerUser(user);
 
             return ResponseEntity.ok(
                     Map.of(
-                            "message", "User registered successfully",
-                            "user", registeredUser
+                            "message",
+                            "User registered successfully",
+
+                            "user",
+                            registeredUser
                     )
             );
 
         } catch (RuntimeException e) {
+
             return ResponseEntity
                     .badRequest()
-                    .body(Map.of("error", e.getMessage()));
+                    .body(
+                            Map.of(
+                                    "error",
+                                    e.getMessage()
+                            )
+                    );
         }
     }
 }

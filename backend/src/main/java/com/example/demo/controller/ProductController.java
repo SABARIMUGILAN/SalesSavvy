@@ -17,7 +17,10 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(
-        origins = "https://salessavvy-frontend-latest.onrender.com",
+        origins = {
+                "https://salessavvy-frontend-latest.onrender.com",
+                "https://sabarimugilan.github.io"
+        },
         allowCredentials = "true"
 )
 @RequestMapping("/api/products")
@@ -57,11 +60,13 @@ public class ProductController {
             response.put("user", userInfo);
 
             // Add product details
-            List<Map<String, Object>> productList = new ArrayList<>();
+            List<Map<String, Object>> productList =
+                    new ArrayList<>();
 
             for (Product product : products) {
 
-                Map<String, Object> productDetails = new HashMap<>();
+                Map<String, Object> productDetails =
+                        new HashMap<>();
 
                 productDetails.put(
                         "product_id",

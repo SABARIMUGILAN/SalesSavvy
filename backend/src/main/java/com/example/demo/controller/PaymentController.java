@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.entity.OrderItem;
 import com.example.demo.entity.User;
 import com.example.demo.service.PaymentService;
-import com.example.demo.repository.UserRepository;
 import com.razorpay.RazorpayException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(
-        origins = "https://salessavvy-frontend-latest.onrender.com",
+        origins = {
+                "https://salessavvy-frontend-latest.onrender.com",
+                "https://sabarimugilan.github.io"
+        },
         allowCredentials = "true"
 )
 @RequestMapping("/api/payment")
@@ -26,9 +28,6 @@ public class PaymentController {
 
     @Autowired
     private PaymentService paymentService;
-
-    @Autowired
-    private UserRepository userRepository;
 
     /**
      * Create Razorpay Order
@@ -39,7 +38,8 @@ public class PaymentController {
             HttpServletRequest request) {
 
         try {
-            User user = (User) request.getAttribute("authenticatedUser");
+            User user =
+                    (User) request.getAttribute("authenticatedUser");
 
             if (user == null) {
                 return ResponseEntity
@@ -48,39 +48,56 @@ public class PaymentController {
             }
 
             BigDecimal totalAmount =
-                    new BigDecimal(requestBody.get("totalAmount").toString());
+                    new BigDecimal(
+                            requestBody.get("totalAmount").toString()
+                    );
 
             List<Map<String, Object>> cartItemsRaw =
-                    (List<Map<String, Object>>) requestBody.get("cartItems");
+                    (List<Map<String, Object>>)
+                            requestBody.get("cartItems");
 
-            List<OrderItem> cartItems = cartItemsRaw.stream()
-                    .map(item -> {
-                        OrderItem orderItem = new OrderItem();
+            List<OrderItem> cartItems =
+                    cartItemsRaw.stream()
+                            .map(item -> {
 
-                        orderItem.setProductId(
-                                (Integer) item.get("productId")
-                        );
+                                OrderItem orderItem =
+                                        new OrderItem();
 
-                        orderItem.setQuantity(
-                                (Integer) item.get("quantity")
-                        );
+                                orderItem.setProductId(
+                                        (Integer)
+                                                item.get("productId")
+                                );
 
-                        BigDecimal pricePerUnit =
-                                new BigDecimal(item.get("price").toString());
+                                orderItem.setQuantity(
+                                        (Integer)
+                                                item.get("quantity")
+                                );
 
-                        orderItem.setPricePerUnit(pricePerUnit);
+                                BigDecimal pricePerUnit =
+                                        new BigDecimal(
+                                                item.get("price")
+                                                        .toString()
+                                        );
 
-                        orderItem.setTotalPrice(
-                                pricePerUnit.multiply(
-                                        BigDecimal.valueOf(
-                                                (Integer) item.get("quantity")
+                                orderItem.setPricePerUnit(
+                                        pricePerUnit
+                                );
+
+                                orderItem.setTotalPrice(
+                                        pricePerUnit.multiply(
+                                                BigDecimal.valueOf(
+                                                        (Integer)
+                                                                item.get(
+                                                                        "quantity"
+                                                                )
+                                                )
                                         )
-                                )
-                        );
+                                );
 
-                        return orderItem;
-                    })
-                    .collect(Collectors.toList());
+                                return orderItem;
+
+                            })
+                            .collect(Collectors.toList());
 
             String razorpayOrderId =
                     paymentService.createOrder(
@@ -96,7 +113,9 @@ public class PaymentController {
             e.printStackTrace();
 
             return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .status(
+                            HttpStatus.INTERNAL_SERVER_ERROR
+                    )
                     .body(
                             "Error creating Razorpay order: "
                                     + e.getMessage()
@@ -124,8 +143,11 @@ public class PaymentController {
             HttpServletRequest request) {
 
         try {
+
             User user =
-                    (User) request.getAttribute("authenticatedUser");
+                    (User) request.getAttribute(
+                            "authenticatedUser"
+                    );
 
             if (user == null) {
                 return ResponseEntity
@@ -136,13 +158,22 @@ public class PaymentController {
             int userId = user.getUserId();
 
             String razorpayOrderId =
-                    (String) requestBody.get("razorpayOrderId");
+                    (String)
+                            requestBody.get(
+                                    "razorpayOrderId"
+                            );
 
             String razorpayPaymentId =
-                    (String) requestBody.get("razorpayPaymentId");
+                    (String)
+                            requestBody.get(
+                                    "razorpayPaymentId"
+                            );
 
             String razorpaySignature =
-                    (String) requestBody.get("razorpaySignature");
+                    (String)
+                            requestBody.get(
+                                    "razorpaySignature"
+                            );
 
             boolean isVerified =
                     paymentService.verifyPayment(
@@ -160,14 +191,18 @@ public class PaymentController {
 
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Payment verification failed");
+                    .body(
+                            "Payment verification failed"
+                    );
 
         } catch (Exception e) {
 
             e.printStackTrace();
 
             return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .status(
+                            HttpStatus.INTERNAL_SERVER_ERROR
+                    )
                     .body(
                             "Error verifying payment: "
                                     + e.getMessage()
